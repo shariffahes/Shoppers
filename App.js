@@ -2,11 +2,30 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import StoreNavigator from "./Navigation/Navigation";
 import { enableScreens } from "react-native-screens";
+import { createStore, combineReducers } from "redux";
+import { Provider } from "react-redux";
+import productReducer from "./Store/reducers/product";
+import { useFonts } from "expo-font";
 
 enableScreens();
+const rooteReducer = combineReducers({
+  products: productReducer,
+});
+const store = createStore(rooteReducer);
 
 export default function App() {
-  return <StoreNavigator />;
+  const [isFontLoaded] = useFonts({
+    "open-sans": require("./assets/fonts/OpenSans-Regular.ttf"),
+    "open-sans-bold": require("./assets/fonts/OpenSans-Bold.ttf"),
+  });
+
+  if (!isFontLoaded) return null;
+
+  return (
+    <Provider store={store}>
+      <StoreNavigator />
+    </Provider>
+  );
 }
 
 const styles = StyleSheet.create({

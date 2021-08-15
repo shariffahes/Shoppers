@@ -8,14 +8,31 @@ import DetailsScreen from "../Screens/Shop/ProductDetailsScreen";
 import OrderScreen from "../Screens/Shop/OrdersScreen";
 import MyProductsScreen from "../Screens/User/MyProductsScreen";
 import { Entypo, FontAwesome } from "@expo/vector-icons";
+import Colors from "../Constants/Colors";
+import { Platform } from "react-native";
 
 const StoreStack = createNativeStackNavigator();
 
 const DrawerStack = createDrawerNavigator();
 
+const setScreenHeaderColors = () => ({
+  headerStyle: {
+    backgroundColor: Platform.OS === "android" ? Colors.primary : "",
+  },
+  headerTitleStyle: {
+    fontFamily: "open-sans-bold",
+  },
+
+  headerTintColor: Platform.OS === "android" ? Colors.accent : Colors.primary,
+  drawerActiveTintColor: Colors.primary,
+});
+const setDetailsScreenOption = ({ route }) => ({
+  headerTitle: route.params.title,
+});
+
 const StoreNavigation = () => {
   return (
-    <StoreStack.Navigator>
+    <StoreStack.Navigator screenOptions={setScreenHeaderColors}>
       <StoreStack.Screen
         name="My Store"
         component={DrawerNavigation}
@@ -24,13 +41,17 @@ const StoreNavigation = () => {
         }}
       />
       <StoreStack.Screen name="My Cart" component={CartScreen} />
-      <StoreStack.Screen name="Details" component={DetailsScreen} />
+      <StoreStack.Screen
+        name="Details"
+        component={DetailsScreen}
+        options={setDetailsScreenOption}
+      />
     </StoreStack.Navigator>
   );
 };
 
 const DrawerNavigation = () => {
-  const setStoreScreenOptions = ({ navigation, route }) => {
+  const setStoreScreenOptions = () => {
     return {
       drawerIcon: (props) => (
         <Entypo name="shopping-bag" size={props.size} color={props.color} />
@@ -38,7 +59,7 @@ const DrawerNavigation = () => {
     };
   };
   return (
-    <DrawerStack.Navigator>
+    <DrawerStack.Navigator screenOptions={setScreenHeaderColors}>
       <DrawerStack.Screen
         name="Store"
         component={StoreScreen}

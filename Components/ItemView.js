@@ -7,6 +7,8 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { Entypo } from "@expo/vector-icons";
+import Colors from "../Constants/Colors";
+import CustomText from "./CustomText";
 
 const ItemView = (props) => {
   const item = props.storeItem;
@@ -20,24 +22,26 @@ const ItemView = (props) => {
           resizeMode="cover"
         >
           <View style={styles.headerStyle}>
-            <Text style={styles.priceStyle}>${item.price}</Text>
+            <CustomText style={styles.priceStyle}>
+              ${item.price.toFixed(2)}
+            </CustomText>
           </View>
           <View style={styles.footerStyle}>
             <Entypo
               name="heart"
               size={25}
-              color="red"
+              color={Colors.accent}
               style={{ flex: 0.5, textAlign: "center" }}
             />
             <View style={{ flex: 1 }}>
-              <Text style={styles.titleStyle} numberOfLines={1}>
+              <CustomText style={styles.titleStyle} numberOfLines={1}>
                 {item.name}
-              </Text>
+              </CustomText>
             </View>
             <Entypo
               name="shopping-cart"
               size={25}
-              color="red"
+              color={Colors.accent}
               style={{
                 flex: 0.5,
                 textAlign: "center",
@@ -56,6 +60,7 @@ const styles = StyleSheet.create({
     margin: 8,
     overflow: "hidden",
     borderRadius: 16,
+    elevation: 10,
   },
   imageStyle: {
     width: "100%",
@@ -76,12 +81,19 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "white",
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "open-sans-bold",
   },
   headerStyle: {
-    alignSelf: "flex-start",
+    alignSelf: "center",
   },
-  priceStyle: {},
+  priceStyle: {
+    backgroundColor: "rgba(0,0,0,0.7)",
+    color: "white",
+    padding: 4,
+    margin: 2,
+    fontSize: 16,
+    fontFamily: "open-sans-bold",
+  },
 });
 
 export default ItemView;
