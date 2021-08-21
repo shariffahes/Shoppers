@@ -1,19 +1,20 @@
-import React, { useCallback, useEffect, useReducer } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import {
   View,
   StyleSheet,
   ScrollView,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from "react-native";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import { useDispatch, useSelector } from "react-redux";
 import CustomHeaderButton from "../../Components/CustomHeaderButton";
 import InputField from "../../Components/InputField";
 import { createProduct, updateProduct } from "../../Store/actions/products";
-
+import * as Failed from "../../Components/FailedAlert";
+import Colors from "../../Constants/Colors";
 const formReducer = (state, action) => {
   if (action.type === "FORM_INPUT_UPDATE") {
-    console.log(state);
     const updatedValues = {
       ...state.inputValues,
       [action.inputTrigger]: action.value,
@@ -62,6 +63,8 @@ const AddScreen = (props) => {
     formIsValid: editedProduct ? true : false,
   });
 
+  const [isLoading, setLoading] = useState(false);
+
   const dispatch = useDispatch();
   useEffect(() => {
     props.navigation.setOptions({
@@ -76,7 +79,6 @@ const AddScreen = (props) => {
               if (!formState.formIsValid) return;
 
               submitHandler();
-              props.navigation.goBack();
             }}
           />
         </HeaderButtons>
@@ -85,29 +87,39 @@ const AddScreen = (props) => {
     });
   }, [submitHandler, formState]);
 
-  const submitHandler = useCallback(() => {
+  const submitHandler = useCallback(async () => {
+    setLoading(true);
+
     const price = parseFloat(formState.inputValues.priceInput);
-    if (editedProduct) {
-      dispatch(
-        updateProduct(
-          params.prodId,
-          formState.inputValues.titleInput,
-          formState.inputValues.descriptionInput,
-          formState.inputValues.imageInput,
-          price
-        )
-      );
-    } else {
-      dispatch(
-        createProduct(
-          formState.inputValues.titleInput,
-          formState.inputValues.descriptionInput,
-          formState.inputValues.imageInput,
-          price
-        )
-      );
+    try {
+      if (editedProduct) {
+        await dispatch(
+          updateProduct(
+            params.prodId,
+            formState.inputValues.titleInput,
+            formState.inputValues.descriptionInput,
+            formState.inputValues.imageInput,
+            price
+          )
+        );
+      } else {
+        await dispatch(
+          createProduct(
+            formState.inputValues.titleInput,
+            formState.inputValues.descriptionInput,
+            formState.inputValues.imageInput,
+            price
+          )
+        );
+      }
+      setLoading(false);
+      props.navigation.goBack();
+    } catch (err) {
+      Failed.FailedAlert();
+      setLoading(false);
+      throw new Error("Err");
     }
-  }, [dispatch, formState]);
+  }, [dispatch, formState, isLoading]);
 
   const inputChangeHandler = useCallback(
     (identifier, state) => {
@@ -121,63 +133,68 @@ const AddScreen = (props) => {
     [formDispatch]
   );
 
+  if (isLoading)
+    return (
+      <View style={styles.mainIndicator}>
+        <ActivityIndicator color={Colors.primary} size="large" />
+      </View>
+    );
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior="padding"
-      keyboardVerticalOffset={100}
-    >
-      <ScrollView style={styles.scrollMain}>
-        <View style={styles.main}>
-          <InputField
-            identifier="titleInput"
-            required
-            label="Title"
-            errorMsg="Enter a valid title"
-            autoCapitalize="sentences"
-            inputChangeHandler={inputChangeHandler}
-            initialValue={formState.inputValues.titleInput}
-            initiallyValid={formState.inputValidities.titleInput}
-          />
-          <InputField
-            identifier="imageInput"
-            required
-            label="Image URL"
-            errorMsg="Enter a valid url"
-            inputChangeHandler={inputChangeHandler}
-            initialValue={formState.inputValues.imageInput}
-            initiallyValid={formState.inputValidities.imageInput}
-          />
-          <InputField
-            identifier="descriptionInput"
-            required
-            label="Description"
-            errorMsg="Enter a valid description"
-            multiline={true}
-            numeberOfLines={3}
-            inputChangeHandler={inputChangeHandler}
-            initialValue={formState.inputValues.descriptionInput}
-            initiallyValid={formState.inputValidities.descriptionInput}
-          />
-          <InputField
-            identifier="priceInput"
-            required
-            label="Price"
-            errorMsg="Invalid! make sure that the price is between $1 and $5000"
-            keyboardType="decimal-pad"
-            inputChangeHandler={inputChangeHandler}
-            initialValue={formState.inputValues.priceInput}
-            initiallyValid={formState.inputValidities.priceInput}
-            min={1}
-            max={5000}
-          />
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+    <ScrollView style={styles.scrollMain}>
+      <View style={styles.main}>
+        <InputField
+          identifier="titleInput"
+          required
+          label="Title"
+          errorMsg="Enter a valid title"
+          autoCapitalize="sentences"
+          inputChangeHandler={inputChangeHandler}
+          initialValue={formState.inputValues.titleInput}
+          initiallyValid={formState.inputValidities.titleInput}
+        />
+        <InputField
+          identifier="imageInput"
+          required
+          label="Image URL"
+          errorMsg="Enter a valid url"
+          inputChangeHandler={inputChangeHandler}
+          initialValue={formState.inputValues.imageInput}
+          initiallyValid={formState.inputValidities.imageInput}
+        />
+        <InputField
+          identifier="descriptionInput"
+          required
+          label="Description"
+          errorMsg="Enter a valid description"
+          multiline={true}
+          numeberOfLines={3}
+          inputChangeHandler={inputChangeHandler}
+          initialValue={formState.inputValues.descriptionInput}
+          initiallyValid={formState.inputValidities.descriptionInput}
+        />
+        <InputField
+          identifier="priceInput"
+          required
+          label="Price"
+          errorMsg="Invalid! make sure that the price is between $1 and $5000"
+          keyboardType="decimal-pad"
+          inputChangeHandler={inputChangeHandler}
+          initialValue={formState.inputValues.priceInput}
+          initiallyValid={formState.inputValidities.priceInput}
+          min={1}
+          max={5000}
+        />
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  mainIndicator: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   scrollMain: {
     flex: 1,
     backgroundColor: "white",

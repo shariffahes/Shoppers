@@ -1,5 +1,12 @@
-import React from "react";
-import { View, Text, StyleSheet, Button, FlatList } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import CustomText from "../../Components/CustomText";
 import Colors from "../../Constants/Colors";
@@ -21,7 +28,7 @@ const CartScreen = (_) => {
     });
   }
   const dispatch = useDispatch();
-
+  const [isLoading, setLoading] = useState(false);
   const renderList = ({ item }) => {
     return (
       <CartItemView
@@ -40,12 +47,19 @@ const CartScreen = (_) => {
         <CustomText style={styles.amountStyle}>
           Total: <CustomText>{total.toFixed(2)}</CustomText>
         </CustomText>
-        <Button
-          title="Order Now"
-          color={Colors.accent}
-          disabled={items.length === 0}
-          onPress={() => dispatch(orderItems(items, total))}
-        />
+        {!isLoading ? (
+          <Button
+            title="Order Now"
+            color={Colors.accent}
+            disabled={items.length === 0}
+            onPress={() => {
+              setLoading(true);
+              dispatch(orderItems(items, total)).then((_) => setLoading(false));
+            }}
+          />
+        ) : (
+          <ActivityIndicator />
+        )}
       </View>
       <FlatList data={items} renderItem={renderList} />
     </View>

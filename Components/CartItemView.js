@@ -4,7 +4,6 @@ import Colors from "../Constants/Colors";
 import CustomText from "./CustomText";
 import { Entypo } from "@expo/vector-icons";
 const CartItemView = (props) => {
-  console.log(props.title);
   return (
     <View style={styles.card}>
       <View style={styles.info}>
@@ -54,6 +53,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "open-sans-bold",
     fontSize: 18,
+    width: 140,
   },
   circleAvatar: {
     height: 60,

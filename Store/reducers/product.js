@@ -1,19 +1,25 @@
-import { ITEMS } from "../../Modal/Data/dummy";
 import Item from "../../Modal/Item";
 import {
   CREATE_PRODUCT,
   DELETE_PRODUCT,
+  SET_PRODUCTS,
   UPDATE_PRODUCT,
 } from "../actions/products";
 
 const initialState = {
-  availableProducts: ITEMS,
-  userProducts: ITEMS.filter((prod) => prod.ownerId === "u1"),
+  availableProducts: [],
+  userProducts: [],
   favProducts: [],
 };
 
 export default (state = initialState, action) => {
   switch (action.type) {
+    case SET_PRODUCTS:
+      return {
+        availableProducts: action.products,
+        userProducts: action.products.filter((prod) => prod.ownerId === "u1"),
+        favProducts: [],
+      };
     case DELETE_PRODUCT:
       return {
         ...state,
@@ -54,7 +60,7 @@ export default (state = initialState, action) => {
     case CREATE_PRODUCT:
       const info = action.product;
       const newProduct = new Item(
-        new Date().toString(),
+        info.id,
         "u1",
         info.title,
         info.price,

@@ -1,4 +1,4 @@
-import { ORDER_ITEMS } from "../actions/Order";
+import { ORDER_ITEMS, SET_ORDERS } from "../actions/Order";
 import Order from "../../Modal/OrderItem";
 const initialState = {
   orders: [],
@@ -6,14 +6,18 @@ const initialState = {
 
 export default (state = initialState, action) => {
   switch (action.type) {
+    case SET_ORDERS:
+      return {
+        orders: action.history,
+      };
     case ORDER_ITEMS:
       const orderedData = action.orderInfo;
-      const date = new Date();
+
       const orderItem = new Order(
-        date.toString(),
+        action.id,
         orderedData.orderedProducts,
         orderedData.totalAmount,
-        new Date()
+        orderedData.date
       );
 
       return {

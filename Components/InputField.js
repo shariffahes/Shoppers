@@ -9,8 +9,6 @@ const FOCUS_ENDED = "FOCUS_ENDED";
 const inputReducer = (state, action) => {
   switch (action.type) {
     case INPUT_CHANGE:
-      console.log(state);
-
       return {
         ...state,
         value: action.value,
