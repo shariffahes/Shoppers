@@ -1,13 +1,11 @@
 import React from "react";
 import {
   View,
-  Text,
   StyleSheet,
   ImageBackground,
   TouchableWithoutFeedback,
 } from "react-native";
-import { Entypo } from "@expo/vector-icons";
-import Colors from "../Constants/Colors";
+
 import CustomText from "./CustomText";
 
 const ItemView = (props) => {
@@ -27,26 +25,12 @@ const ItemView = (props) => {
             </CustomText>
           </View>
           <View style={styles.footerStyle}>
-            <Entypo
-              name="heart"
-              size={25}
-              color={Colors.accent}
-              style={{ flex: 0.5, textAlign: "center" }}
-            />
             <View style={{ flex: 1 }}>
-              <CustomText style={styles.titleStyle} numberOfLines={1}>
+              <CustomText style={styles.titleStyle} numberOfLines={2}>
                 {item.name}
               </CustomText>
             </View>
-            <Entypo
-              name="shopping-cart"
-              size={25}
-              color={Colors.accent}
-              style={{
-                flex: 0.5,
-                textAlign: "center",
-              }}
-            />
+            {props.children}
           </View>
         </ImageBackground>
       </View>

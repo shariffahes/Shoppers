@@ -7,15 +7,16 @@ import {
   Dimensions,
   Button,
 } from "react-native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import CustomText from "../../Components/CustomText";
+import * as CartActions from "../../Store/actions/Cart";
 
 const ProductDetailsScreen = (props) => {
   const id = props.route.params.productId;
   const product = useSelector((state) =>
     state.products.availableProducts.find((prod) => prod.id === id)
   );
-
+  const dispatch = useDispatch();
   return (
     <ScrollView>
       <View style={styles.mainView}>
@@ -24,7 +25,11 @@ const ProductDetailsScreen = (props) => {
           source={{ uri: product.imageURL }}
           resizeMode="cover"
         />
-        <Button title="Add to Cart" style={{ height: 50 }} />
+        <Button
+          title="Add to Cart"
+          style={{ height: 50 }}
+          onPress={() => dispatch(CartActions.addToCart(product))}
+        />
         <CustomText style={styles.price}>
           ${product.price.toFixed(2)}
         </CustomText>

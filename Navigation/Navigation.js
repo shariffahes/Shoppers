@@ -10,6 +10,7 @@ import MyProductsScreen from "../Screens/User/MyProductsScreen";
 import { Entypo, FontAwesome } from "@expo/vector-icons";
 import Colors from "../Constants/Colors";
 import { Platform } from "react-native";
+import AddScreen from "../Screens/User/AddSreen";
 
 const StoreStack = createNativeStackNavigator();
 
@@ -46,6 +47,7 @@ const StoreNavigation = () => {
         component={DetailsScreen}
         options={setDetailsScreenOption}
       />
+      <StoreStack.Screen name="The product" component={AddScreen} />
     </StoreStack.Navigator>
   );
 };
