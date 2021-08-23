@@ -3,11 +3,13 @@ import Order from "../../Modal/OrderItem";
 export const ORDER_ITEMS = "ORDER_ITEMS";
 export const SET_ORDERS = "SET_ORDERS";
 export const orderItems = (orderedItems, totalAmount) => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     try {
       const dateOfOrder = new Date();
       const response = await fetch(
-        "https://my-store-573da-default-rtdb.firebaseio.com/orders/u1.json",
+        `https://my-store-573da-default-rtdb.firebaseio.com/orders/${
+          getState().auth.userId
+        }.json?auth=${getState().auth.token}`,
         {
           method: "POST",
           headers: {
@@ -39,10 +41,12 @@ export const orderItems = (orderedItems, totalAmount) => {
 };
 
 export const fetchOrdersHistory = () => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     try {
       const response = await fetch(
-        "https://my-store-573da-default-rtdb.firebaseio.com/orders/u1.json"
+        `https://my-store-573da-default-rtdb.firebaseio.com/orders/${
+          getState().auth.userId
+        }.json`
       );
       if (!response.ok) throw new Error();
       const data = await response.json();

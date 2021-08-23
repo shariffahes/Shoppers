@@ -6,10 +6,12 @@ export const CREATE_PRODUCT = "CREATE_PRODUCT";
 export const UPDATE_PRODUCT = "UPDATE_PRODUCT";
 
 export const deleteProduct = (id) => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     try {
       const response = await fetch(
-        `https://my-store-573da-default-rtdb.firebaseio.com/products/${id}.json`,
+        `https://my-store-573da-default-rtdb.firebaseio.com/products/${id}.json?auth=${
+          getState().auth.token
+        }`,
         {
           method: "DELETE",
         }
@@ -23,16 +25,24 @@ export const deleteProduct = (id) => {
 };
 
 export const createProduct = (title, description, imageURL, price) => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     try {
       const response = await fetch(
-        "https://my-store-573da-default-rtdb.firebaseio.com/products.json",
+        `https://my-store-573da-default-rtdb.firebaseio.com/products.json?auth=${
+          getState().auth.token
+        }`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ title, description, imageURL, price }),
+          body: JSON.stringify({
+            title,
+            description,
+            imageURL,
+            price,
+            ownerId: getState().auth.userId,
+          }),
         }
       );
       if (!response.ok) throw new Error("Err");
@@ -46,6 +56,7 @@ export const createProduct = (title, description, imageURL, price) => {
           description,
           imageURL,
           price,
+          userId: getState().auth.userId,
         },
       });
     } catch (err) {
@@ -55,10 +66,12 @@ export const createProduct = (title, description, imageURL, price) => {
 };
 
 export const updateProduct = (id, title, description, imageURL, price) => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     try {
       const response = await fetch(
-        `https://my-store-573da-default-rtdb.firebaseio.com/products/${id}.json`,
+        `https://my-store-573da-default-rtdb.firebaseio.com/products/${id}.json?auth=${
+          getState().auth.token
+        }`,
         {
           method: "PATCH",
           headers: {
@@ -85,7 +98,7 @@ export const updateProduct = (id, title, description, imageURL, price) => {
 };
 
 export const fetchProducts = () => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     try {
       const response = await fetch(
         "https://my-store-573da-default-rtdb.firebaseio.com/products.json"
@@ -100,7 +113,7 @@ export const fetchProducts = () => {
         fetchedData.push(
           new Item(
             key,
-            "u1",
+            item.ownerId,
             item.title,
             item.price,
             item.imageURL,
@@ -112,6 +125,7 @@ export const fetchProducts = () => {
       dispatch({
         type: SET_PRODUCTS,
         products: fetchedData,
+        userId: getState().auth.userId,
       });
     } catch (err) {
       console.log(err);

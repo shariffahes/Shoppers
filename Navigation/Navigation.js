@@ -11,6 +11,8 @@ import { Entypo, FontAwesome } from "@expo/vector-icons";
 import Colors from "../Constants/Colors";
 import { Platform } from "react-native";
 import AddScreen from "../Screens/User/AddSreen";
+import AuthenticationScreen from "../Screens/User/AuthScreen";
+import { useSelector } from "react-redux";
 
 const StoreStack = createNativeStackNavigator();
 
@@ -32,22 +34,34 @@ const setDetailsScreenOption = ({ route }) => ({
 });
 
 const StoreNavigation = () => {
+  const authState = useSelector((state) => state.auth);
+
+  const isAuthenticated = authState.token !== null;
   return (
     <StoreStack.Navigator screenOptions={setScreenHeaderColors}>
-      <StoreStack.Screen
-        name="My Store"
-        component={DrawerNavigation}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <StoreStack.Screen name="My Cart" component={CartScreen} />
-      <StoreStack.Screen
-        name="Details"
-        component={DetailsScreen}
-        options={setDetailsScreenOption}
-      />
-      <StoreStack.Screen name="The product" component={AddScreen} />
+      {!isAuthenticated ? (
+        <StoreStack.Screen
+          name="Authentication"
+          component={AuthenticationScreen}
+        />
+      ) : (
+        <>
+          <StoreStack.Screen
+            name="My Store"
+            component={DrawerNavigation}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <StoreStack.Screen name="My Cart" component={CartScreen} />
+          <StoreStack.Screen
+            name="Details"
+            component={DetailsScreen}
+            options={setDetailsScreenOption}
+          />
+          <StoreStack.Screen name="The product" component={AddScreen} />
+        </>
+      )}
     </StoreStack.Navigator>
   );
 };
