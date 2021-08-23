@@ -1,6 +1,7 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export const SIGN_UP = "SIGN_UP";
-export const LOG_IN = "LOG_IN";
-
+export const AUTHENTICATE = "AUTHENTICATE";
+export const LOG_OUT = "LOG_OUT";
 export const signUp = (email, password) => {
   return async (dispatch) => {
     try {
@@ -29,12 +30,12 @@ export const signUp = (email, password) => {
       }
       const data = await response.json();
 
-      dispatch({
-        type: SIGN_UP,
-        userId: data.localId,
-        token: data.idToken,
-        expires: data.expiresIn,
-      });
+      dispatch(
+        setData(data.idToken, data.localId, parseInt(data.expiresIn) * 1000)
+      );
+      const expirationDuration =
+        new Date().getTime() + parseInt(data.expiresIn) * 1000;
+      saveDataToStorage(data.idToken, data.localId, expirationDuration);
     } catch (error) {
       throw error;
     }
@@ -72,15 +73,52 @@ export const logIn = (email, password) => {
       }
       const data = await response.json();
 
-      dispatch({
-        type: LOG_IN,
-        token: data.idToken,
-        userId: data.localId,
-        expires: data.expiresIn,
-      });
+      dispatch(
+        setData(data.idToken, data.localId, parseInt(data.expiresIn) * 1000)
+      );
+      const expirationDuration =
+        new Date().getTime() + parseInt(data.expiresIn) * 1000;
+      saveDataToStorage(data.idToken, data.localId, expirationDuration);
     } catch (error) {
       console.log(error);
       throw error;
     }
+  };
+};
+
+const saveDataToStorage = (token, userId, expireDuration) => {
+  AsyncStorage.setItem(
+    "userData",
+    JSON.stringify({ token: token, userId: userId, expiresIn: expireDuration })
+  );
+};
+
+export const setData = (token, userId, expireTime) => {
+  return (dispatch) => {
+    dispatch({
+      type: AUTHENTICATE,
+      userId: userId,
+      token: token,
+    });
+    dispatch(setLogOutTimer(expireTime));
+  };
+};
+
+export const Logout = () => {
+  AsyncStorage.removeItem("userData");
+  clearAnyPrevTimer();
+  return {
+    type: LOG_OUT,
+  };
+};
+let timer;
+const clearAnyPrevTimer = () => {
+  if (timer) clearTimeout(timer);
+};
+const setLogOutTimer = (expirationDuration) => {
+  return (dispatch) => {
+    timer = setTimeout(() => {
+      dispatch(Logout());
+    }, expirationDuration);
   };
 };

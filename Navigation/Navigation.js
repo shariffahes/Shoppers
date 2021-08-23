@@ -1,6 +1,11 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createDrawerNavigator } from "@react-navigation/drawer";
+import {
+  createDrawerNavigator,
+  DrawerContentScrollView,
+  DrawerItem,
+  DrawerItemList,
+} from "@react-navigation/drawer";
 import { NavigationContainer } from "@react-navigation/native";
 import StoreScreen from "../Screens/Shop/StoreScreen";
 import CartScreen from "../Screens/Shop/CartScreen";
@@ -9,10 +14,12 @@ import OrderScreen from "../Screens/Shop/OrdersScreen";
 import MyProductsScreen from "../Screens/User/MyProductsScreen";
 import { Entypo, FontAwesome } from "@expo/vector-icons";
 import Colors from "../Constants/Colors";
-import { Platform } from "react-native";
+import { Button, Platform } from "react-native";
 import AddScreen from "../Screens/User/AddSreen";
 import AuthenticationScreen from "../Screens/User/AuthScreen";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import StartUpScreen from "../Screens/StartupScreen";
+import { Logout } from "../Store/actions/auth";
 
 const StoreStack = createNativeStackNavigator();
 
@@ -40,10 +47,13 @@ const StoreNavigation = () => {
   return (
     <StoreStack.Navigator screenOptions={setScreenHeaderColors}>
       {!isAuthenticated ? (
-        <StoreStack.Screen
-          name="Authentication"
-          component={AuthenticationScreen}
-        />
+        <>
+          <StoreStack.Screen name="My Shop" component={StartUpScreen} />
+          <StoreStack.Screen
+            name="Authentication"
+            component={AuthenticationScreen}
+          />
+        </>
       ) : (
         <>
           <StoreStack.Screen
@@ -66,6 +76,24 @@ const StoreNavigation = () => {
   );
 };
 
+const CustomDrawerContent = (props) => {
+  const dispatch = useDispatch();
+  return (
+    <DrawerContentScrollView {...props}>
+      <DrawerItemList {...props} />
+      <DrawerItem
+        label="Log out"
+        icon={({ color, size }) => (
+          <Entypo name="log-out" size={size} color={color} />
+        )}
+        onPress={() => {
+          dispatch(Logout());
+        }}
+      />
+    </DrawerContentScrollView>
+  );
+};
+
 const DrawerNavigation = () => {
   const setStoreScreenOptions = () => {
     return {
@@ -75,7 +103,10 @@ const DrawerNavigation = () => {
     };
   };
   return (
-    <DrawerStack.Navigator screenOptions={setScreenHeaderColors}>
+    <DrawerStack.Navigator
+      screenOptions={setScreenHeaderColors}
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+    >
       <DrawerStack.Screen
         name="Store"
         component={StoreScreen}
