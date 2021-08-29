@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  KeyboardAvoidingView,
   ActivityIndicator,
 } from "react-native";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
